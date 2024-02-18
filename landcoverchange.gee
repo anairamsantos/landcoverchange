@@ -1,0 +1,258 @@
+var points = ee.FeatureCollection("users/me/folder/class_2022")
+var studyarea = ee.FeatureCollection("users/me/folder/area_studo");//BR_Mesorregioes_2021_PP
+
+var mosaico = ee.Image()
+ var app_sentinel = function (image)
+{
+//NDVI
+var blue = image.select('B2');
+var green = image.select('B3');
+var nir = image.select('B8');
+var red = image.select('B4');
+var swir1 = image.select('B11');
+
+var ndvi = image.normalizedDifference(['B8', 'B4']);
+var evi = image.expression('2.5 * ((nir-red) / (nir + 6 * red - 7.5 * blue +1))',{
+  blue: image.select('B2'),
+  nir : image.select('B8'),
+  red : image.select('B4')});
+
+
+var ndwi=(swir1.add(red).add(nir.add(blue))).divide(swir1.add(red).subtract(nir.add(blue))).rename('NDWI');
+var ndmi = image.normalizedDifference(['B8', 'B11']);
+var bsi = green.add(nir).divide(green.add(nir)).rename('BSI')
+
+image = image.addBands(ndvi.rename('NDVI'));
+image = image.addBands(evi.rename('EVI'));
+image = image.addBands(ndwi.rename('NDWI'));
+image = image.addBands(ndmi.rename('NDMI'));
+image = image.addBands(bsi.rename('BSI'));
+return image;
+}
+
+var img = ee.ImageCollection ('COPERNICUS/S2')
+            .filterDate('2019-09-01','2020-03-31')
+            //.select('B2','B3','B4','B5','B8','B12')
+            .select('B2','B3','B4','B8','B11')
+            .map(function (image){
+              return image.clip(studyarea)})
+            .filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'less_than',1)
+            .filterBounds(studyarea)
+            .map(app_sentinel);
+
+img = img.median();           
+mosaico = mosaico.addBands({
+              srcImg: img,
+               overwrite: false
+  });
+  
+var img = ee.ImageCollection ('COPERNICUS/S2')
+            .filterDate('2020-09-01','2021-03-31')
+            .select('B2','B3','B4','B8','B11')
+            .map(function (image){
+              return image.clip(studyarea)})
+            .filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'less_than',1)
+            .filterBounds(studyarea)
+            .map(app_sentinel);
+
+img = img.median();           
+mosaico = mosaico.addBands({
+              srcImg: img,
+               overwrite: false
+  })
+  
+var img = ee.ImageCollection ('COPERNICUS/S2')
+            .filterDate('2021-09-01','2022-03-31')
+            .select('B2','B3','B4','B8','B11')
+            .map(function (image){
+              return image.clip(studyarea)})
+            .filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'less_than',1)
+            .filterBounds(studyarea)
+            .map(app_sentinel);
+
+img = img.median();           
+mosaico = mosaico.addBands({
+              srcImg: img,
+               overwrite: false
+  })  
+  
+var img = ee.ImageCollection ('COPERNICUS/S1_GRD')
+            .filter(ee.Filter.eq('instrumentMode', 'IW'))
+            .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+            .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))
+            .filterDate('2016-09-01','2017-03-31')
+            .filterBounds(studyarea)
+            .map(function (image){
+              return image.clip(studyarea)})
+img = img.median();              
+mosaico = mosaico.addBands({
+              srcImg: img,
+               overwrite: false
+  });
+  
+var img = ee.ImageCollection ('COPERNICUS/S1_GRD')
+            .filter(ee.Filter.eq('instrumentMode', 'IW'))
+            .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+            .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))
+            .filterDate('2017-09-01','2018-03-31')
+            .filterBounds(studyarea)
+            .map(function (image){
+              return image.clip(studyarea)})
+img = img.median();              
+mosaico = mosaico.addBands({
+              srcImg: img,
+               overwrite: false
+  });
+
+var img = ee.ImageCollection ('COPERNICUS/S1_GRD')
+            .filter(ee.Filter.eq('instrumentMode', 'IW'))
+            .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+            .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))
+            .filterDate('2018-09-01','2019-03-31')
+            .filterBounds(studyarea)
+            .map(function (image){
+              return image.clip(studyarea)})
+img = img.median();              
+mosaico = mosaico.addBands({
+              srcImg: img,
+               overwrite: false
+  });
+  
+
+var img = ee.ImageCollection ('COPERNICUS/S1_GRD')
+            .filter(ee.Filter.eq('instrumentMode', 'IW'))
+            .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+            .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))
+            .filterDate('2019-09-01','2020-03-31')
+            .filterBounds(studyarea)
+            .map(function (image){
+              return image.clip(studyarea)})
+img = img.median();              
+mosaico = mosaico.addBands({
+              srcImg: img,
+               overwrite: false
+  });
+
+var img = ee.ImageCollection ('COPERNICUS/S1_GRD')
+            .filter(ee.Filter.eq('instrumentMode', 'IW'))
+            .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+            .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))
+            .filterDate('2020-09-01','2021-03-31')
+            .filterBounds(studyarea)
+            .map(function (image){
+              return image.clip(studyarea)})
+              
+img = img.median();              
+mosaico = mosaico.addBands({
+              srcImg: img,
+               overwrite: false
+  });
+
+
+var img = ee.ImageCollection ('COPERNICUS/S1_GRD')
+            .filter(ee.Filter.eq('instrumentMode', 'IW'))
+            .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+            .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'))
+            .filterDate('2021-09-01','2022-03-31')
+            .filterBounds(studyarea)
+            .map(function (image){
+              return image.clip(studyarea)})
+
+img = img.median();              
+mosaico = mosaico.addBands({
+              srcImg: img,
+               overwrite: false
+  });
+  
+print(mosaico, 'Mosaico Final')
+
+//adicionando imagem a visualização
+Map.setCenter(-51.641252675060656,-22.082469259404125,8);
+Map.addLayer(studyarea,{color: '#ffffff'}, 'Municipios de estudo');
+
+//amostras de treinamento e validação
+//var sample = points.randomColumn();
+var trainingsample=points.randomColumn().filter('random <=0.7');
+var validationsample=points.randomColumn().filter('random > 0.7');
+
+print(trainingsample, 'Training sample');
+print(validationsample, 'Validation sample');
+//Map.addLayer(trainingsample,{color: '#00FF00'}, 'Training Sample');
+//Map.addLayer(validationsample,{color: '#FF0000'}, 'Validation Sample');
+
+
+var bands = ['VH.*','VV.*','NDVI.*','EVI.*','NDWI.*','NDMI.*','BSI.*'];
+
+//print(bands)
+var trainingsample = mosaico.select(bands).sampleRegions({
+    collection: trainingsample,
+    properties: ['class_2022'],
+    scale: 50
+});
+
+print(trainingsample, 'Training data Band values');
+
+var validationsample = mosaico.select(bands).sampleRegions({
+    collection: validationsample,
+    properties: ['class_2022'],
+    scale: 50
+
+});
+
+print(validationsample, 'Validation data Band values');
+
+//----------Classificador Random Forest -------------
+var RFClass=ee.Classifier.smileRandomForest(150).train(trainingsample,'class_2022');
+var Classified= mosaico.classify(RFClass);
+var Palette = [
+  '#04381d',//Veg Nativa-verde
+  '#FFFFB2',//Pastagem - amarelo
+  '#fc8114',//Soja - laranja
+  '#ffa07a',//Outras lavouras - cor de pele
+  '#ff00ff',//Área não vegetada - magenta
+  '#0000FF',//Corpos d'água - azul
+  'gray'//Cana - cinza
+];
+
+Map.addLayer(Classified, {palette: Palette, min:1, max:7 }, 'Classificado 2022')
+var mosaico = ee.Image();
+//// Accuracy Assessment
+// Get a confusion matrix and overall accuracy for the training sample.
+var trainAccuracy = RFClass.confusionMatrix();
+print('Training error matrix', trainAccuracy);
+print('Training overall accuracy', trainAccuracy.accuracy());
+
+// Get a confusion matrix and overall accuracy for the validation sample.
+validationsample = validationsample.classify(RFClass);
+var validationAccuracy = validationsample.errorMatrix('class_2022', 'classification');
+print('Validation error matrix', validationAccuracy);
+print('Validation accuracy', validationAccuracy.accuracy());
+print('Kappa statistic', validationAccuracy.kappa());
+print("Consumer's accuracy", validationAccuracy.consumersAccuracy());
+print("Producer's accuracy", validationAccuracy.producersAccuracy());
+///// Variable Importance
+var explain = RFClass.explain();
+print(explain, 'Explain');
+print(validationsample)
+
+// Calculate the Receiver Operating Characteristic (ROC) curve
+// -----------------------------------------------------------
+print(ui.Chart.feature.byFeature(validationsample, 'class_2022', 'classification').setOptions({
+      title: 'Curva',
+      legend: 'none',
+      hAxis: { title: 'Classe observada'},
+      vAxis: { title: 'Classe obtida'},
+      lineWidth: 1}))
+      
+//Variable Importance of RF Classifier
+//var variable_importance = ee.Feature(null, ee.Dictionary(explain).get('importance'));
+
+//// Export
+Export.image.toDrive({
+  image: Classified,
+  description: 'RF_Classified_map',
+  region: studyarea,
+  scale: 20,
+  fileFormat: 'GeoTIFF',
+  maxPixels: 1e12,
+});
